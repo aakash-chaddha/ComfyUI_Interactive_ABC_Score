@@ -6,6 +6,8 @@ is a plain ComfyUI string in and out, so any text node can feed the score and
 any string consumer can take it away. Everything renders and sounds offline:
 abcjs and a General-MIDI piano SoundFont are vendored in this package.
 
+![alt text](assets/image.png)
+
 ## Usage
 
 Add **text / ABC Score**. It starts with the two-voice demo score in
