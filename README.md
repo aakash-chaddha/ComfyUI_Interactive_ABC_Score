@@ -8,8 +8,6 @@ abcjs and a General-MIDI piano SoundFont are vendored in this package.
 
 <video controls src="assets/demo.mp4" title="Title"></video>
 
-![alt text](assets/image.png)
-
 ## Usage
 
 Add **text / Sheet Music Editor**. It starts with the two-voice demo score in
