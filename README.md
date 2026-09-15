@@ -8,8 +8,6 @@ abcjs and a General-MIDI piano SoundFont are vendored in this package.
 
 https://github.com/user-attachments/assets/c0cf3506-2f00-4954-bf1f-7bbe89d34e3c
 
-https://github.com/aakash-chaddha/ComfyUI_SheetMusicEditor/raw/refs/heads/main/assets/demo.mp4
-
 ## Usage
 
 Add **text / Sheet Music Editor**. It starts with the two-voice demo score in
