@@ -1,29 +1,40 @@
 # ComfyUI Interactive ABC Score
 
-One node — **ABC Score** — that renders ABC notation as sheet music inside the
-graph, plays it, and lets you edit the music on the staff itself. The ABC text
+One node — **Sheet Music Editor** — that renders ABC notation as sheet music
+inside the graph, plays it, and lets you edit the music on the staff itself. The ABC text
 is a plain ComfyUI string in and out, so any text node can feed the score and
 any string consumer can take it away. Everything renders and sounds offline:
 abcjs and a General-MIDI piano SoundFont are vendored in this package.
 
-![alt text](assets/image.png)
+<video controls src="assets/demo.mp4" title="Title"></video>
+
+
 
 ## Usage
 
-Add **text / ABC Score**. It starts with the two-voice demo score in
+Add **text / Sheet Music Editor**. It starts with the two-voice demo score in
 `input_sample.txt`; edit that file to change the tune a new node starts with.
 
-- **Score pane** (click a note): selects it and hears it. Drag it up/down on
-  the staff to change its pitch; the ABC text rewrites itself.
-- **Text pane**: the raw ABC, editable. Typing re-renders the score; score
-  edits rewrite the pane.
-- **Player pane**: play/pause, restart, loop, seek, tempo (25–400%), and
-  transpose the current tune by semitones. Audio starts on the first click
-  (browser rule).
-- The node header says where the text comes from: `ABC Score — self` versus
-  `ABC Score — from: <upstream node>`. While linked, editing gestures are
-  refused; **Detach & edit** breaks the link and keeps the shown score as the
-  node's own text.
+The node is split like a small score editor: the **score** and the **ABC text**
+side by side, each using the full node height with its own scrollbar. Drag the
+bar between them to resize (double-click resets it); the `▸` button collapses
+the text side when the score needs the room. Playback lives in a transport bar
+that is always visible at the bottom.
+
+- **Score** (click a note): selects it and hears it. Drag it up/down on the
+  staff to change its pitch; the ABC text rewrites itself.
+- **Text**: the raw ABC, editable. Typing re-renders the score; score edits
+  rewrite the pane.
+- **Transport bar**: play/pause, restart, loop, seek with elapsed/total time,
+  tempo (25–400%), and transpose the current tune by semitones. Audio starts
+  on the first click (browser rule).
+- **Toolbar**: a `sheet zoom level` slider (50–150%) scales the sheet music — zooming out
+  fits more music on each system; the `⇄` button swaps the score and text
+  sides (left-to-right ↔ right-to-left).
+- While the text comes from an upstream node, the toolbar shows
+  `text from: <upstream node>`, editing gestures are refused, and
+  **Detach & edit** breaks the link and keeps the shown score as the node's
+  own text. With no link the node owns its text and shows nothing.
 
 ## Score keyboard (while the node has focus)
 

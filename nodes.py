@@ -10,6 +10,12 @@ class ABCScore:
     ui "text" echo is the authoritative mirror the editor adopts on execute.
     """
 
+    DESCRIPTION = (
+        "Renders ABC notation as sheet music in the graph: playback, click-to-hear, "
+        "and editing on the staff itself. The ABC text passes through verbatim - a "
+        "string input drives the score, a string output returns the current score."
+    )
+
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -29,4 +35,4 @@ class ABCScore:
 
 
 NODE_CLASS_MAPPINGS = {"AbcScore": ABCScore}
-NODE_DISPLAY_NAME_MAPPINGS = {"AbcScore": "ABC Score"}
+NODE_DISPLAY_NAME_MAPPINGS = {"AbcScore": "Sheet Music Editor"}

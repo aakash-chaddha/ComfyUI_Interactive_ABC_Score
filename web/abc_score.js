@@ -26,28 +26,48 @@ const CURSOR_COLOR = "#e04040";
 const UNDO_LIMIT = 100;
 
 const CSS = `
-.abcs-root { font-family: sans-serif; font-size: 12px; color: #ddd; display: flex; flex-direction: column; gap: 4px; height: 100%; width: 100%; overflow: hidden; box-sizing: border-box; }
+.abcs-root { font-family: sans-serif; font-size: 12px; color: #ddd; display: flex; flex-direction: column; height: 100%; width: 100%; overflow: hidden; box-sizing: border-box; }
 .abcs-root * { box-sizing: border-box; }
-.abcs-header { display: flex; align-items: center; gap: 6px; flex: none; }
-.abcs-source { opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.abcs-hint { color: #e8a04f; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.abcs-root button { background: #353535; color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 2px 6px; cursor: pointer; }
-.abcs-root button:hover { background: #484848; }
-.abcs-root button.abcs-on { background: #4a7a4a; border-color: #6a9a6a; }
-.abcs-pane { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-.abcs-pane.abcs-hidden { display: none; }
-.abcs-pane-player { flex: none; }
-.abcs-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
-.abcs-warnings { display: none; flex: none; max-height: 88px; overflow-y: auto; border-left: 3px solid #b8722c; background: #2b2117; color: #e6b06a; font-size: 11px; line-height: 1.45; white-space: pre-wrap; padding: 3px 6px; }
+.abcs-toolbar { display: flex; align-items: center; gap: 6px; flex: none; padding-bottom: 5px; }
+.abcs-source { opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55%; }
+.abcs-hint { color: #e8a04f; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.abcs-collapse { margin-left: auto; flex: none; width: 22px; padding: 2px 0; text-align: center; }
+.abcs-swap { flex: none; width: 24px; padding: 2px 0; text-align: center; }
+.abcs-zoom { width: 70px; flex: none; }
+.abcs-zoom-label { width: 36px; text-align: right; flex: none; font-variant-numeric: tabular-nums; }
+.abcs-root button { background: #353535; color: #ddd; border: 1px solid #4a4a4a; border-radius: 3px; padding: 2px 7px; cursor: pointer; line-height: 1.4; }
+.abcs-root button:hover { background: #454545; border-color: #5b7fd4; }
+.abcs-root button.abcs-on { background: #3d6b46; border-color: #5a9a66; }
+.abcs-main { flex: 1 1 auto; min-height: 0; display: flex; }
+.abcs-root.abcs-swapped .abcs-main { flex-direction: row-reverse; }
+.abcs-pane-score { flex: 1 1 0; min-width: 160px; display: flex; flex-direction: column; overflow: hidden; background: #262626; border: 1px solid #3a3a3a; border-radius: 4px; }
+.abcs-splitter { flex: none; width: 5px; margin: 0 2px; border-radius: 2px; background: #3a3a3a; cursor: col-resize; align-self: stretch; }
+.abcs-splitter:hover, .abcs-splitter:active { background: #5b7fd4; }
+.abcs-pane-text { flex: 1 1 42%; min-width: 150px; display: flex; overflow: hidden; }
+.abcs-root.abcs-collapsed .abcs-pane-text, .abcs-root.abcs-collapsed .abcs-splitter { display: none; }
+.abcs-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 4px; }
+.abcs-scroll::-webkit-scrollbar { width: 10px; height: 10px; }
+.abcs-scroll::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 5px; border: 2px solid #262626; }
+.abcs-scroll::-webkit-scrollbar-thumb:hover { background: #5b7fd4; }
+.abcs-scroll::-webkit-scrollbar-track { background: transparent; }
+.abcs-warnings { display: none; flex: none; max-height: 80px; overflow-y: auto; border-top: 2px solid #b8722c; background: #2b2117; color: #e6b06a; font-size: 11px; line-height: 1.45; white-space: pre-wrap; padding: 3px 8px; }
 .abcs-warnings.abcs-warn { display: block; }
-.abcs-notune { color: #888; padding: 8px; }
+.abcs-notune { color: #888; padding: 12px; }
 .abcs-paper svg { display: block; }
-.abcs-pane-text textarea { flex: 1 1 auto; width: 100%; background: #1e1e1e; color: #cde; border: 1px solid #444; font-family: monospace; font-size: 12px; resize: none; }
-.abcs-player { display: flex; align-items: center; gap: 6px; flex: none; }
-.abcs-player input[type=range] { flex: 1 1 auto; }
-.abcs-tempo { width: 90px; flex: none; }
-.abcs-tempo-label { width: 34px; text-align: right; flex: none; }
-.abcs-audio-hint { color: #888; }
+.abcs-pane-text textarea { flex: 1 1 auto; width: 100%; background: #1e1e1e; color: #cde; border: 1px solid #3a3a3a; border-radius: 4px; font-family: monospace; font-size: 12px; line-height: 1.5; padding: 6px 8px; resize: none; outline: none; }
+.abcs-pane-text textarea:focus { border-color: #5b7fd4; }
+.abcs-pane-text textarea::-webkit-scrollbar { width: 10px; }
+.abcs-pane-text textarea::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 5px; border: 2px solid #1e1e1e; }
+.abcs-transport { flex: none; display: flex; align-items: center; gap: 6px; padding: 6px 0 0; margin-top: 6px; border-top: 1px solid #3a3a3a; }
+.abcs-transport input[type=range] { accent-color: #5b7fd4; }
+.abcs-tbtn { width: 26px; flex: none; text-align: center; padding: 2px 0; }
+.abcs-progress { flex: 1 1 auto; min-width: 60px; }
+.abcs-time { flex: none; width: 82px; text-align: center; color: #aaa; font-variant-numeric: tabular-nums; }
+.abcs-sep { flex: none; width: 1px; height: 16px; background: #4a4a4a; }
+.abcs-caption { flex: none; color: #999; }
+.abcs-tempo { width: 80px; flex: none; }
+.abcs-tempo-label { width: 38px; text-align: right; flex: none; font-variant-numeric: tabular-nums; }
+.abcs-audio-hint { color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 `;
 
 let cssInjected = false;
@@ -66,6 +86,7 @@ class AbcScorePane {
 		this.undoStack = [];
 		this.redoStack = [];
 		this.tempo = 1.0;
+		this.zoom = 1.0;
 		this.loop = false;
 		this.playing = false;
 		this.tuneIdx = 0;
@@ -93,38 +114,42 @@ class AbcScorePane {
 		const root = document.createElement("div");
 		root.className = "abcs-root";
 		root.innerHTML = `
-			<div class="abcs-header">
+			<div class="abcs-toolbar">
 				<span class="abcs-source"></span>
 				<button class="abcs-detach" style="display:none">Detach &amp; edit</button>
 				<span class="abcs-hint"></span>
-				<button class="abcs-toggle" data-pane="score">score</button>
-				<button class="abcs-toggle" data-pane="text">text</button>
-				<button class="abcs-toggle" data-pane="player">player</button>
+				<span class="abcs-caption">sheet zoom level</span>
+				<input class="abcs-zoom" type="range" min="50" max="150" value="100" step="5" title="sheet zoom level">
+				<span class="abcs-zoom-label">100%</span>
+				<button class="abcs-swap" title="swap score and text sides">&#8644;</button>
+				<button class="abcs-collapse" title="hide text pane">&#9656;</button>
 			</div>
-			<div class="abcs-pane abcs-pane-score">
-				<div class="abcs-scroll">
-					<div class="abcs-paper"></div>
-					<div class="abcs-notune" style="display:none">no tune found</div>
+			<div class="abcs-main">
+				<div class="abcs-pane-score">
+					<div class="abcs-scroll">
+						<div class="abcs-paper"></div>
+						<div class="abcs-notune" style="display:none">no tune found</div>
+					</div>
+					<div class="abcs-warnings"></div>
 				</div>
-				<div class="abcs-warnings"></div>
+				<div class="abcs-splitter" title="drag to resize, double-click to reset"></div>
+				<div class="abcs-pane-text"><textarea spellcheck="false"></textarea></div>
 			</div>
-			<div class="abcs-pane abcs-pane-text abcs-hidden"><textarea spellcheck="false"></textarea></div>
-			<div class="abcs-pane abcs-pane-player abcs-hidden">
-				<div class="abcs-player">
-					<button class="abcs-play">&#9654;</button>
-					<button class="abcs-restart" title="restart">&#9198;</button>
-					<button class="abcs-loop" title="loop">&#10227;</button>
-					<input class="abcs-progress" type="range" min="0" max="100" value="0" step="0.1">
-					<span class="abcs-audio-hint"></span>
-				</div>
-				<div class="abcs-player">
-					<span>tempo</span>
-					<input class="abcs-tempo" type="range" min="25" max="400" value="100">
-					<span class="abcs-tempo-label">100%</span>
-					<span>transpose</span>
-					<button class="abcs-transpose-down" title="transpose down a semitone">−1</button>
-					<button class="abcs-transpose-up" title="transpose up a semitone">+1</button>
-				</div>
+			<div class="abcs-transport">
+				<button class="abcs-play abcs-tbtn" title="play / pause">&#9654;</button>
+				<button class="abcs-restart abcs-tbtn" title="restart">&#8634;</button>
+				<button class="abcs-loop abcs-tbtn" title="loop">&#10227;</button>
+				<input class="abcs-progress" type="range" min="0" max="100" value="0" step="0.1">
+				<span class="abcs-time">0:00 / 0:00</span>
+				<span class="abcs-sep"></span>
+				<span class="abcs-caption">tempo</span>
+				<input class="abcs-tempo" type="range" min="25" max="400" value="100">
+				<span class="abcs-tempo-label">100%</span>
+				<span class="abcs-sep"></span>
+				<span class="abcs-caption">transpose</span>
+				<button class="abcs-transpose-down abcs-tbtn" title="transpose down a semitone">&#8722;1</button>
+				<button class="abcs-transpose-up abcs-tbtn" title="transpose up a semitone">+1</button>
+				<span class="abcs-audio-hint"></span>
 			</div>
 		`;
 		this.root = root;
@@ -133,17 +158,15 @@ class AbcScorePane {
 		this.textarea = this.el(".abcs-pane-text textarea");
 		this.paper = this.el(".abcs-paper");
 
-		root.querySelectorAll(".abcs-toggle").forEach((btn) => {
-			const pane = btn.dataset.pane;
-			btn.classList.toggle("abcs-on", !this.el(`.abcs-pane-${pane}`).classList.contains("abcs-hidden"));
-			btn.onclick = () => {
-				const paneEl = this.el(`.abcs-pane-${pane}`);
-				paneEl.classList.toggle("abcs-hidden");
-				btn.classList.toggle("abcs-on");
-				if (pane === "text") this.#syncTextarea();
-				this.scheduleRender();
-			};
-		});
+		this.el(".abcs-collapse").onclick = () => {
+			const collapsed = root.classList.toggle("abcs-collapsed");
+			const btn = this.el(".abcs-collapse");
+			btn.innerHTML = collapsed ? "&#9666;" : "&#9656;";
+			btn.title = collapsed ? "show text pane" : "hide text pane";
+			if (!collapsed) this.#syncTextarea();
+			this.scheduleRender();
+		};
+		this.#initSplitter();
 
 		this.el(".abcs-detach").onclick = () => this.detach();
 		this.el(".abcs-play").onclick = () => this.playToggle();
@@ -161,6 +184,15 @@ class AbcScorePane {
 				this.#startTune(this.tuneIdx, pct);
 			}
 		};
+		this.el(".abcs-zoom").oninput = (e) => {
+			this.zoom = e.target.value / 100;
+			this.el(".abcs-zoom-label").textContent = `${e.target.value}%`;
+			this.editor?.paramChanged({ scale: this.zoom });
+		};
+		this.el(".abcs-swap").onclick = () => {
+			this.root.classList.toggle("abcs-swapped");
+			this.scheduleRender();
+		};
 		this.el(".abcs-transpose-down").onclick = () => this.applyEdit({ kind: "transpose", semitones: -1 });
 		this.el(".abcs-transpose-up").onclick = () => this.applyEdit({ kind: "transpose", semitones: 1 });
 		this.el(".abcs-audio-hint").textContent = "click play to enable audio";
@@ -175,6 +207,43 @@ class AbcScorePane {
 		this.node.addDOMWidget("abc-score", "abcscore", root, { serialize: false, hideOnZoom: false });
 		const domWidget = this.node.widgets.find((w) => w.name === "abc-score");
 		domWidget.computeSize = () => [this.node.size[0] - 22, Math.max(120, this.node.size[1] - 52)];
+	}
+
+	// Score and text sit side by side so both long vertical contents get the
+	// full node height; the splitter resizes the text pane in px, double-click
+	// hands the flex layout back. abcjs only re-fits on redraw, so re-render
+	// when a drag or collapse changes the paper width.
+	#initSplitter() {
+		const splitter = this.el(".abcs-splitter");
+		const textPane = this.el(".abcs-pane-text");
+		let dragging = false;
+		let startX = 0;
+		let startWidth = 0;
+		splitter.addEventListener("pointerdown", (e) => {
+			dragging = true;
+			startX = e.clientX;
+			startWidth = textPane.getBoundingClientRect().width;
+			splitter.setPointerCapture(e.pointerId);
+			e.preventDefault();
+		});
+		splitter.addEventListener("pointermove", (e) => {
+			if (!dragging) return;
+			const room = Math.max(160, this.el(".abcs-main").clientWidth - 220);
+			const dx = this.root.classList.contains("abcs-swapped") ? e.clientX - startX : startX - e.clientX;
+			const width = Math.min(Math.max(150, startWidth + dx), room);
+			textPane.style.flex = `0 0 ${width}px`;
+		});
+		const endDrag = () => {
+			if (!dragging) return;
+			dragging = false;
+			this.scheduleRender();
+		};
+		splitter.addEventListener("pointerup", endDrag);
+		splitter.addEventListener("pointercancel", endDrag);
+		splitter.addEventListener("dblclick", () => {
+			textPane.style.flex = "";
+			this.scheduleRender();
+		});
 	}
 
 	setHint(text) {
@@ -209,11 +278,11 @@ class AbcScorePane {
 		if (linked) {
 			const link = app.graph?._links?.get(input.link);
 			const origin = link ? app.graph.getNodeById(link.origin_id) : null;
-			label.textContent = `ABC Score — from: ${origin ? origin.title : "link"}`;
+			label.textContent = `text from: ${origin ? origin.title : "link"}`;
 			this.undoStack = [];
 			this.redoStack = [];
 		} else {
-			label.textContent = "ABC Score — self";
+			label.textContent = "";
 		}
 		this.el(".abcs-detach").style.display = linked ? "" : "none";
 		this.textarea.readOnly = linked;
@@ -295,6 +364,7 @@ class AbcScorePane {
 		this.editor = new ABCJS.Editor(this.textarea, {
 			canvas_id: this.paper,
 			render_options: {
+				scale: this.zoom,
 				responsive: "width",
 				dragging: true,
 				selectionColor: "#5b7fd4",
@@ -518,6 +588,7 @@ class AbcScorePane {
 		if (startPercent > 0) synth.seek(startPercent);
 		synth.start();
 		this.#startPolling();
+		this.#setTime(startPercent * (this.tc.lastMoment || 0), this.tc.lastMoment || 0);
 	}
 
 	#startPolling() {
@@ -528,6 +599,7 @@ class AbcScorePane {
 			const now = this.tc.currentMillisecond();
 			const progress = this.el(".abcs-progress");
 			progress.value = Math.min(100, (now / last) * 100);
+			this.#setTime(now, last);
 			if (now >= last) {
 				const next = this.tuneIdx + 1;
 				if (next < this.editor.getTunes().length || this.loop) this.#startTune(next % this.editor.getTunes().length);
@@ -560,6 +632,15 @@ class AbcScorePane {
 		if (!this.tc) return;
 		this.synth?.seek(percent);
 		this.tc.setProgress(percent);
+		this.#setTime(percent * (this.tc.lastMoment || 0), this.tc.lastMoment || 0);
+	}
+
+	#setTime(now, last) {
+		const fmt = (ms) => {
+			const s = Math.max(0, Math.round(ms / 1000));
+			return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+		};
+		this.el(".abcs-time").textContent = `${fmt(now)} / ${fmt(last)}`;
 	}
 
 	setPlayButton(on) {
