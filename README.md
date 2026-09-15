@@ -6,7 +6,7 @@ is a plain ComfyUI string in and out, so any text node can feed the score and
 any string consumer can take it away. Everything renders and sounds offline:
 abcjs and a General-MIDI piano SoundFont are vendored in this package.
 
-<video controls src="https://github.com/aakash-chaddha/ComfyUI_SheetMusicEditor/blob/main/assets/demo.mp4" title="Title"></video>
+<video controls src="https://github.com/aakash-chaddha/ComfyUI_SheetMusicEditor/raw/main/assets/demo.mp4" width="100%"></video>
 
 ## Usage
 
