@@ -1,4 +1,4 @@
-# ComfyUI Interactive ABC Score
+# ComfyUI Sheet Music Editor
 
 One node — **Sheet Music Editor** — that renders ABC notation as sheet music
 inside the graph, plays it, and lets you edit the music on the staff itself. The ABC text
