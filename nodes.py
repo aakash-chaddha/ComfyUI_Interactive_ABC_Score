@@ -1,13 +1,6 @@
-EXAMPLE_ABC = """X:1
-T:ComfyUI Hornpipe
-C:Traditional
-M:C
-L:1/8
-Q:1/4=110
-K:G
-(3DEF GABd | g2 BG e2 cB | A2 AB cBAG | F2 AF D2 (3DEF |
-G2 Gg g2 fg | a2 bg a2 gf | g2 fe d2 (3DEF | G2 BG D2 z2 |]
-"""
+import pathlib
+
+EXAMPLE_ABC = (pathlib.Path(__file__).parent / "input_sample.txt").read_text(encoding="utf-8")
 
 
 class ABCScore:

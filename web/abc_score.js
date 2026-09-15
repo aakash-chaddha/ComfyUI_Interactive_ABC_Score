@@ -1,4 +1,4 @@
-import { app } from "../../scripts/api.js";
+import { app } from "../../scripts/app.js";
 import { edit, locate, noteMidi, tuneStarts } from "./edit_model.js";
 
 const ABCJS_GLOBAL = "ABCJS";
@@ -34,10 +34,12 @@ const CSS = `
 .abcs-root button { background: #353535; color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 2px 6px; cursor: pointer; }
 .abcs-root button:hover { background: #484848; }
 .abcs-root button.abcs-on { background: #4a7a4a; border-color: #6a9a6a; }
-.abcs-pane { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.abcs-pane { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .abcs-pane.abcs-hidden { display: none; }
-.abcs-scroll { flex: 1 1 auto; overflow-y: auto; }
-.abcs-warnings { color: #c96; font-size: 11px; white-space: pre-wrap; flex: none; }
+.abcs-pane-player { flex: none; }
+.abcs-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+.abcs-warnings { display: none; flex: none; max-height: 88px; overflow-y: auto; border-left: 3px solid #b8722c; background: #2b2117; color: #e6b06a; font-size: 11px; line-height: 1.45; white-space: pre-wrap; padding: 3px 6px; }
+.abcs-warnings.abcs-warn { display: block; }
 .abcs-notune { color: #888; padding: 8px; }
 .abcs-paper svg { display: block; }
 .abcs-pane-text textarea { flex: 1 1 auto; width: 100%; background: #1e1e1e; color: #cde; border: 1px solid #444; font-family: monospace; font-size: 12px; resize: none; }
@@ -133,7 +135,7 @@ class AbcScorePane {
 
 		root.querySelectorAll(".abcs-toggle").forEach((btn) => {
 			const pane = btn.dataset.pane;
-			btn.classList.add("abcs-on");
+			btn.classList.toggle("abcs-on", !this.el(`.abcs-pane-${pane}`).classList.contains("abcs-hidden"));
 			btn.onclick = () => {
 				const paneEl = this.el(`.abcs-pane-${pane}`);
 				paneEl.classList.toggle("abcs-hidden");
@@ -208,7 +210,6 @@ class AbcScorePane {
 			const link = app.graph?._links?.get(input.link);
 			const origin = link ? app.graph.getNodeById(link.origin_id) : null;
 			label.textContent = `ABC Score — from: ${origin ? origin.title : "link"}`;
-			if (this.undoStack.length || this.redoStack.length) this.invalidateUndoOnNextGesture();
 			this.undoStack = [];
 			this.redoStack = [];
 		} else {
@@ -216,12 +217,17 @@ class AbcScorePane {
 		}
 		this.el(".abcs-detach").style.display = linked ? "" : "none";
 		this.textarea.readOnly = linked;
-		if (!linked) {
-			this.#syncTextarea();
-			const w = this.widget();
-			if (w) w.computeSize = () => [0, -4]; // the pane owns the visible text
-		}
+		if (!linked) this.#syncTextarea();
+		this.#hideTextWidget();
 		this.mirrorCache = null;
+	}
+
+	// A multiline STRING input is a DOM textarea widget in the frontend, so the
+	// node would show the raw ABC on top of the pane that already edits it. The
+	// widget stays for value plumbing and execution; only its layout goes away.
+	#hideTextWidget() {
+		const w = this.widget();
+		if (w) w.hidden = true;
 	}
 
 	upstreamValue() {
@@ -288,7 +294,6 @@ class AbcScorePane {
 		this.#syncTextarea();
 		this.editor = new ABCJS.Editor(this.textarea, {
 			canvas_id: this.paper,
-			warnings_id: this.el(".abcs-warnings"),
 			render_options: {
 				responsive: "width",
 				dragging: true,
@@ -310,6 +315,7 @@ class AbcScorePane {
 		if (!this.editor) return;
 		const tunes = this.editor.getTunes();
 		this.el(".abcs-notune").style.display = tunes.length ? "none" : "";
+		this.#showWarnings(tunes);
 		this.selectableMaps = tunes.map((tune) => {
 			const map = new Map();
 			for (const sel of tune.getSelectableArray()) {
@@ -320,6 +326,16 @@ class AbcScorePane {
 		});
 		this.prevCursor = null;
 		if (this.playing) this.#startTune(this.tuneIdx); // re-prime audio only when the text actually changed
+	}
+
+	// abcjs would write "No errors" into a warnings_id div, so we keep the div
+	// ourselves and show nothing when the parse is clean. abcjs marks the offending
+	// character with inline HTML; plain text is enough here.
+	#showWarnings(tunes) {
+		const warnings = tunes.flatMap((tune) => tune.warnings ?? []);
+		const el = this.el(".abcs-warnings");
+		el.textContent = warnings.map((w) => w.replace(/<[^>]*>/g, "")).join("\n");
+		el.classList.toggle("abcs-warn", warnings.length > 0);
 	}
 
 	// --- score interaction ---
@@ -565,8 +581,6 @@ app.registerExtension({
 		nodeType.prototype.onNodeCreated = function () {
 			const r = origCreated?.apply(this, arguments);
 			this.setSize?.([720, 520]);
-			const w = this.widgets?.find((x) => x.name === "abc");
-			if (w) w.computeSize = () => [0, -4];
 			this.abcPane = new AbcScorePane(this);
 			return r;
 		};

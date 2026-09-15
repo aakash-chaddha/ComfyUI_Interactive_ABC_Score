@@ -8,7 +8,8 @@ abcjs and a General-MIDI piano SoundFont are vendored in this package.
 
 ## Usage
 
-Add **text / ABC Score**. It starts with a short playable hornpipe.
+Add **text / ABC Score**. It starts with the two-voice demo score in
+`input_sample.txt`; edit that file to change the tune a new node starts with.
 
 - **Score pane** (click a note): selects it and hears it. Drag it up/down on
   the staff to change its pitch; the ABC text rewrites itself.
